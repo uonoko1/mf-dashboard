@@ -14,6 +14,8 @@ debug/
 auth-state.json
 test-auth-state.json
 
+data/moneyforward.db
+data/auth-state.json
 test-groups-moneyforward.db
 test-moneyforward.db*
 *.db-shm

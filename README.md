@@ -1,3 +1,32 @@
+## Fork: 1Password → otpauth
+
+[hiroppy/mf-dashboard](https://github.com/hiroppy/mf-dashboard) のフォーク。
+1Password SDK の代わりに otpauth を使い、環境変数から直接 TOTP を生成する構成に変更。
+
+### セットアップ（フォーク固有）
+
+```bash
+pnpm install
+npx playwright install chromium
+cp .env.example .env
+# .env の MF_USERNAME, MF_PASSWORD, MF_TOTP_SECRET を記入
+```
+
+| 変数             | 必須 | 説明                                                      |
+| ---------------- | ---- | --------------------------------------------------------- |
+| `MF_USERNAME`    | Yes  | マネーフォワードME のメールアドレス                       |
+| `MF_PASSWORD`    | Yes  | マネーフォワードME のパスワード                           |
+| `MF_TOTP_SECRET` | Yes  | 2段階認証の TOTP シークレットキー（base32、スペース除去） |
+
+### upstream の更新を取り込む
+
+```bash
+git fetch upstream
+git merge upstream/main
+```
+
+---
+
 <div align="center">
   <img src="apps/web/public/logo.png" alt="Logo" width="120">
   <h1>MoneyForward Me Dashboard</h1>
