@@ -271,23 +271,19 @@ export async function scrapeCashFlowHistory(
     if (i < monthsToScrape - 1) {
       const currentMonth = await getMonthFromCsvLink(page);
       const prevButton = page.locator("button.fc-button-prev, span.fc-button-prev").first();
-      await prevButton.click();
 
-      // 月が変わるまで待機（CSV linkのURLパラメータで判定）
-      await page.waitForFunction(
-        (prevMonth) => {
-          const link = document.querySelector("a[href*='/cf/csv']");
-          if (!link) return false;
-          const href = link.getAttribute("href") || "";
-          const yearMatch = href.match(/year=(\d{4})/);
-          const monthMatch = href.match(/month=(\d{1,2})/);
-          if (!yearMatch || !monthMatch) return false;
-          const newMonth = `${yearMatch[1]}-${monthMatch[1].padStart(2, "0")}`;
-          return newMonth !== prevMonth;
-        },
-        currentMonth,
-        { timeout: 10000 },
-      );
+      // Wait for /cf/fetch response and click prev button simultaneously
+      await Promise.all([
+        page.waitForResponse((res) => res.url().includes("/cf/fetch") && res.status() === 200),
+        prevButton.click(),
+      ]);
+
+      // If the month didn't change after /cf/fetch returned, no more data is available
+      const newMonth = await getMonthFromCsvLink(page);
+      if (newMonth === currentMonth) {
+        log(`  No more months available after ${currentMonth}, stopping.`);
+        break;
+      }
     }
   }
 
